@@ -13,7 +13,7 @@ struct Student {
 };
 
 // Function to insert a new node at the end of the list
-void insertEnd(struct Student** head, const char* firstName, const char* lastName, const char* phone, char* le>
+void insertEnd(struct Student** head, const char* firstName, const char* lastName, const char* phone, char* level, char* className, int scores[]) {
       struct Student* newNode = (struct Student*)malloc(sizeof(struct Student));
       strcpy(newNode->firstName, firstName);
       strcpy(newNode->lastName, lastName);
