@@ -14,26 +14,21 @@ struct Student {
 
 // Function to insert a new node at the end of the list
 void insertEnd(struct Student** head, const char* firstName, const char* lastName, const char* phone, char* level, char* className, int scores[]) {
-      struct Student* newNode = (struct Student*)malloc(sizeof(struct Student));
-      strcpy(newNode->firstName, firstName);
-      strcpy(newNode->lastName, lastName);
-      strcpy(newNode->phone, phone);
-      strcpy(newNode->level, level);
-      strcpy(newNode->className, className);
-	        memcpy(newNode->scores, scores, sizeof(int) * 12);
 
-    if (*head == NULL) {
-        // If the list is empty, make the new node the head
-        *head = newNode;
-    } else {
-        // Find the last node in the list
-        struct Student* current = *head;
-        while (current->next != NULL) {
-            current = current->next;
-        }
-        // Attach the new node to the last node in the list
-        current->next = newNode;
+  struct Student* newNode = (struct Student*)malloc(sizeof(struct Student));
+    if (newNode == NULL) {
+        printf("Memory allocation error.\n");
+        exit(1);
     }
+    strcpy(newNode->firstName, firstName);
+    strcpy(newNode->lastName, lastName);
+    strcpy(newNode->phone, phone);
+    strcpy(newNode->level, level);
+    strcpy(newNode->className, className);
+    memcpy(newNode->scores, scores, sizeof(int) * 12);
+
+    newNode->next = *head;
+    *head = newNode;
 
 }
 
@@ -59,43 +54,54 @@ int main() {
         return 1;
     }
 
-    struct Student* head = NULL;
+// 2D array of pointers to struct Student
+    struct Student* studentsByLevelAndClass[12][10] = { NULL };
+	
     char firstName[50];
     char lastName[50];
     char phone[11];
     char level[5];
     char className[5];
     int scores[10];
-	int counter = 1;
+    int counter = 1;
+
     // Loop to read each person's information from the file and add them to the linked list
     while (fscanf(file, "%49s %49s %10s %4s %4s", firstName, lastName, phone, level, className) != EOF) {
         for (int i = 0; i < 10; i++) {
             fscanf(file, "%d", &scores[i]);
         }
-        insertEnd(&head, firstName, lastName, phone, level, className, scores);
-printf("%d",counter);
-printf("\n");
-counter = counter + 1;
+        insertEnd(&studentsByLevelAndClass[atoi(level) - 1][atoi(className) - 1], firstName, lastName, phone, level, className, scores);
+		printf("%d\n", counter);
+        counter++;
     }
 
     fclose(file);
 
 
 
-// Loop to print each student's information stored in the linked list
-    struct Student* current = head;
-   while (current != NULL) {
-        printStudent(current);
-        current = current->next;
+    // Loop to print each student's information stored in the linked list
+    for (int i = 0; i < 12; i++) {
+        for (int j = 0; j < 10; j++) {
+            struct Student* current = studentsByLevelAndClass[i][j];
+            while (current != NULL) {
+                printStudent(current);
+                current = current->next;
+            }
+        }
     }
-	
+
     // Free memory
-    current = head;
-    while (current != NULL) {
-        struct Student* temp = current;
-        current = current->next;
-        free(temp);
+    for (int i = 0; i < 12; i++) {
+        for (int j = 0; j < 10; j++) {
+            struct Student* current = studentsByLevelAndClass[i][j];
+            while (current != NULL) {
+                struct Student* temp = current;
+                current = current->next;
+                free(temp);
+            }
+        }
     }
+
 
     return 0;
 }
